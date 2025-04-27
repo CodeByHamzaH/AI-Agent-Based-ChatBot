@@ -10,12 +10,11 @@ OPENAI_API_KEY=os.environ.get("OPENAI_API_KEY")
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search import TavilySearchResults
-import ollama
+from langchain_community.chat_models import ChatOllama
 
-
-# openai_llm=ChatOpenAI(model="gpt-4o-mini")
+openai_llm=ChatOpenAI(modwel="gpt-4o-mini")
 # groq_llm=ChatGroq(model="llama-3.3-70b-versatile")
-ollam_llm = ollama.chat(model="llama3.2:1b")
+ollam_llm = ChatOllama(model="llama3.2:1b")
 
 search_tool=TavilySearchResults(max_results=2)
 
@@ -33,9 +32,14 @@ def get_response_from_ai_agent(llm_id, query, allow_search, system_prompt, provi
     elif provider=="OpenAI":
         llm=ChatOpenAI(model=llm_id)
     elif provider == "ollama":
-        llm=ollama(model=llm_id)
+        llm=ChatOllama(model=llm_id)
 
-    tools=[TavilySearchResults(max_results=2)] if allow_search else []
+    tools=[TavilySearchResults(max_results=2)] if allow_search and provider!="ollama" else []
+
+    if provider=="ollama" and allow_search:
+        internet_search = TavilySearchResults(max_results=2).run({"query":query[0]})
+        system_prompt = str(f"{system_prompt}\n\nSearch Result:\n{str(internet_search[0])}")
+    
     agent=create_react_agent(
         model=llm,
         tools=tools,

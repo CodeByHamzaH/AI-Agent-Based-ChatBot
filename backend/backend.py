@@ -36,7 +36,7 @@ def chat_endpoint(request: RequestState):
     """
     if request.model_name not in ALLOWED_MODEL_NAMES:
         return {"error": "Invalid model name. Kindly select a valid AI model"}
-    
+    print(request)
     llm_id = request.model_name
     query = request.messages
     allow_search = request.allow_search
@@ -50,4 +50,4 @@ def chat_endpoint(request: RequestState):
 #Step3: Run app & Explore Swagger UI Docs
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=9999)
+    uvicorn.run(app, host="127.0.0.1", port=45555)
